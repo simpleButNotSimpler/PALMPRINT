@@ -2,12 +2,13 @@
 %any pixel that is not in the palmline region
 function im_out = clean_image(whitelist, im_in, f_ij, w_ij)
   %get the list of pixel containing the palmlines (whitelist)
-  im_out = im_in;
+  im_out = double(im_in);
   w_row = size(whitelist, 1);
   
   %set se element
-  disk = strel('disk',3,0);
-  disk = disk.Neighborhood;
+%   disk = strel('disk',3,0);
+%   disk = disk.Neighborhood;
+  disk = [1 1 1; 1 1 1; 1 1 1];
   [row, col] = size(disk);
 
   %set border
@@ -18,14 +19,15 @@ function im_out = clean_image(whitelist, im_in, f_ij, w_ij)
       idx = whitelist(t);
       [x, y] = ind2sub(size(im_in), idx);
      
-      im_out(idx) = getAVI(im_out, f_ij, w_ij, disk, m, n, x, y);
+      roi_list = R(disk, m, n, x, y);
+      roi_list = ind2sub(size(im_in), roi_list);
+      
+      im_out(idx) = getAVI(f_ij, w_ij, roi_list);
   end
 end
 
 %average intensity
-function i_bar = getAVI(im, f_ij, w_ij, disk, m, n, x, y)
-   roi_list = R(im, disk, m, n, x, y);
-   
+function i_bar = getAVI(f_ij, w_ij, roi_list)
    % sum_xy
    sum_xy = sum(f_ij(roi_list));
    sum_w_ij = sum(w_ij(roi_list));
@@ -35,17 +37,11 @@ function i_bar = getAVI(im, f_ij, w_ij, disk, m, n, x, y)
 end
 
 %region of interest
-function idx = R(im, disk, m, n, x, y)
-    row_min = x - m;
-    row_max = x + m;
-    col_min = y - n;
-    col_max = y + n;
+function idx = R(disk, m, n, x, y)
+    [row, col] = find(disk == 1);
+    pos = [row, col];
+    pos = pos - [m, n];
     
-    %dummy image
-    dummy_im = im*0;
-    dummy_im(row_min:row_max, col_min:col_max) = disk;
-    
-    %get element whitin the border
-    idx = find(dummy_im == 1);
+    idx = pos + [x, y];
 end
 
