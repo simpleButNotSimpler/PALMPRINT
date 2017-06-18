@@ -2,7 +2,8 @@
 %any pixel that is not in the palmline region
 function im_out = clean_image(whitelist, im_in, f_ij, w_ij)
   %get the list of pixel containing the palmlines (whitelist)
-  im_out = double(im_in);
+%   im_out = double(im_in);
+  im_out = im_in;
   w_row = size(whitelist, 1);
   
   %set se element
@@ -12,15 +13,15 @@ function im_out = clean_image(whitelist, im_in, f_ij, w_ij)
   [row, col] = size(disk);
 
   %set border
-  m = floor(row/2);
-  n = floor(col/2);
+  m = round(row/2);
+  n = round(col/2);
   
   for t=1:w_row
       idx = whitelist(t);
       [x, y] = ind2sub(size(im_in), idx);
      
       roi_list = R(disk, m, n, x, y);
-      roi_list = ind2sub(size(im_in), roi_list);
+      roi_list = sub2ind(size(im_in), roi_list(:,1), roi_list(:,2));
       
       im_out(idx) = getAVI(f_ij, w_ij, roi_list);
   end

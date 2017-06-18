@@ -11,23 +11,22 @@ canny_im = imdilate(canny_im, se);
 [row, col] = find(canny_im == 0);
 whitelist = [row, col];
 
-whitelist = whitelist(whitelist(:,1) > 4, :);
-whitelist = whitelist(whitelist(:,1) < sizr-4, :);
+whitelist = whitelist(whitelist(:,1) > 3, :);
+whitelist = whitelist(whitelist(:,1) < sizr-3, :);
 
-whitelist = whitelist(whitelist(:,2) > 4, :);
-whitelist = whitelist(whitelist(:,2) < sizc-4, :);
+whitelist = whitelist(whitelist(:,2) > 3, :);
+whitelist = whitelist(whitelist(:,2) < sizc-3, :);
 
 whitelist = sub2ind([sizr, sizc], whitelist(:,1), whitelist(:,2));
 
-%f_ij
-f_ij = orig_im;
-idx = find(f_ij(canny_im == 0));
-f_ij(idx) = 2*f_ij(idx); %%cchage it heeeeeeeeeeeeeeeeeeeeeeeeeeeeere
 
 %w_if
-w_ij = ones(sizr, sizc);
-idx = find(w_ij(canny_im == 0));
-w_ij(idx) = 2;
+w_ij = uint8(ones(sizr, sizc));
+w_ij(canny_im == 0) = 2;
+
+%f_ij
+f_ij = uint16(orig_im);
+f_ij = f_ij .* uint16(w_ij);
 
 %% clean the image
 disp('cleaning the image ...')
