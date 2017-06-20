@@ -1,6 +1,15 @@
 %% get the original and the canny image
-orig_im = imread('orig1.bmp');
-canny_im = imread('canny1.bmp');
+[path, name] = uigetfile('D:\imlab\*.bmp');
+if ~name
+    return
+end
+orig_im = imread(fullfile(name, path));
+
+[path, name] = uigetfile('D:\imlab\*.bmp');
+if ~name
+    return
+end
+canny_im = imread(fullfile(name, path));
 
 %% dilate the image
 se = [0 1 0; 1 1 1; 0 1 0];
