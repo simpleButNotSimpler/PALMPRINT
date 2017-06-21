@@ -1,4 +1,4 @@
-function im = remove_trunck(im, endpoints)
+function im = remove_trunck(im, endpoints, threshold)
     %connected components
     cc = bwconncomp(im);
     
@@ -12,7 +12,7 @@ function im = remove_trunck(im, endpoints)
     for t=1:len
         [row, col] = ind2sub(siz, cc.PixelIdxList{t});
         cc_points = [row, col];
-       if ~contains_endpoint(cc_points, endpoints) % add condition for area here
+       if ~contains_endpoint(cc_points, endpoints) && numel(row) < threshold
             im(cc.PixelIdxList{t}) = 0;
        end
     end    

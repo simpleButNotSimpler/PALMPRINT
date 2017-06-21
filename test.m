@@ -6,7 +6,7 @@ im = imread(fullfile(path, name));
 siz = [row, col];
 
 %% get the endpoint lists
-threshold = 4;
+threshold = 6;
 endpoints = endpoints_list(im, threshold);
 
 
@@ -15,14 +15,9 @@ points = [endpoints(:, 1:2); endpoints(:, 3:4)];
 figure, imshow(im); hold on
 plot(points(:, 2), points(:, 1), '*')
 
-%% remove the noises
-im_cl = remove_trunck(im, points);
-
-%% display cleaned image
-figure, imshow(im_cl); hold on
-
 %% connect line truncks
 len = size(endpoints, 1);
+im_cl = im;
 
 for t=1:len
     y1 = endpoints(t, 1);
@@ -37,5 +32,21 @@ for t=1:len
 end
 
 %% display fixed image
+figure, imshow(im_cl); hold on
+
+%% get the endpoint lists
+threshold = 6;
+endpoints = endpoints_list(im_cl, threshold);
+
+%% display im and endpoints
+points = [endpoints(:, 1:2); endpoints(:, 3:4)];
+figure, imshow(im); hold on
+plot(points(:, 2), points(:, 1), '*')
+
+%% remove the noises
+thresh = 40;
+im_cl = remove_trunck(im_cl, points, thresh);
+
+%% display cleaned image
 figure, imshow(im_cl); hold on
 

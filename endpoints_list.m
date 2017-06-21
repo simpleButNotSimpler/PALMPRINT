@@ -10,9 +10,6 @@ points = [x, y];
 %closest points
 idx = closestPoints(points, threshold);
 
-%eliminate points which are connected to each other
-
-
 %filter the idx array
 %remove the nan rows
 [row, ~] = find(~isnan(idx(:, 2)));
