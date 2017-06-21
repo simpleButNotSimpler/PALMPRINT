@@ -40,7 +40,7 @@ endpoints = endpoints_list(im_cl, threshold);
 
 %% display im and endpoints
 points = [endpoints(:, 1:2); endpoints(:, 3:4)];
-figure, imshow(im); hold on
+figure, imshow(im_cl); hold on
 plot(points(:, 2), points(:, 1), '*')
 
 %% remove the noises
