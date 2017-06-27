@@ -1,5 +1,5 @@
 %% get the image
-[path, name] = uigetfile('D:\imlab\*.bmp');
+[path, name] = uigetfile('D:\person2\*.*');
 if ~name
     return
 end
