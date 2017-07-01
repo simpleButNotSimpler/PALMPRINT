@@ -31,14 +31,15 @@ function [R, T, moving, angle, er] = icp(moving, fixed, ntimes, threshold, scali
         temp = (corrFixed - moving).^2;
         er(t) = sqrt( sum(sum(temp, 2)));
         
-        if(eri - er(t)) < threshold || er(t) < threshold
+        if abs(eri - er(t)) < threshold || er(t) < threshold
             break;
         end
         
         eri = er(t);
     end
     
-    angle = acos(R(1, 1)) * 180/pi;
+%     angle = acos(R(1, 1)) * 180/pi;
+    angle = acosd(R(1, 1));
 end
 
 %function to compute the least square transformation

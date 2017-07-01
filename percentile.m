@@ -10,7 +10,7 @@ function th = percentile(im, perc)
     
     if th == 0
         th = 1;
-    else
-        th = xi(th);
     end
+    
+    th = xi(th);
 end

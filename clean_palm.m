@@ -19,6 +19,8 @@ end
 
 % clean the image again
 im = clean_canny(im, dist_threshold, error_threshold, area_threshold);
+im = remove_trunck(im, [], area_threshold);
+
 end
 
 function im = clean_canny(im, dist_threshold, error_threshold, area_threshold)
@@ -165,19 +167,61 @@ function valid_endpoints = get_corr_endpoint_list(im, valid_endpoints, error_thr
     
     tobedeleted = [];
     for t=1:len
-       corr = get_corr_endpoint(im, valid_endpoints(t).head, valid_endpoints(t).corr, error_thresh);
+       [corr, error] = get_corr_endpoint(im, valid_endpoints(t).head, valid_endpoints(t).corr, error_thresh);
        
        if ~isempty(corr)
            valid_endpoints(t).corr = corr;
+           valid_endpoints(t).error = error;
        else
            tobedeleted = [tobedeleted; t];
        end
     end
     
     valid_endpoints(tobedeleted) = [];
+    
+    %one to one correspondance
+    valid_endpoints = onetoone(valid_endpoints);
 end
 
-function corr_point = get_corr_endpoint(im, head, corresp, error_thresh)
+function valid_endpoints = onetoone(valid_endpoints)
+if isempty(valid_endpoints)
+   return 
+end
+
+points = [cat(1, valid_endpoints.head), cat(1, valid_endpoints.corr)];
+
+tobedeleted = [];
+len = size(points, 1);
+witness = (1:len)';
+real_error = cat(1, valid_endpoints.error);
+dummy_error = ones(len, 1)*inf;
+
+for t=1:len
+    if isnan(points(t, 1))
+        continue
+    end
+    
+    idx = ismember(points(:, 3:4), points(t, 1:2), 'rows');
+    if ~any(idx)
+        continue
+    end
+    
+    dummy_error = dummy_error*inf;
+    
+    idx = witness(idx);
+    idx = [idx; t];
+    dummy_error(idx) = real_error(idx);
+    [~, minidx] = min(dummy_error);
+    idx = idx(idx ~= minidx);
+    
+    points(idx, :) = repmat([NaN NaN NaN NaN], numel(idx), 1);
+    tobedeleted = [tobedeleted; idx];
+end
+
+valid_endpoints(tobedeleted) = [];
+end
+
+function [corr_point, error] = get_corr_endpoint(im, head, corresp, error_thresh)
     len = size(corresp, 1);
     head_pixlist = bwtraceboundary(im, head, 'W');
     
@@ -216,8 +260,10 @@ function corr_point = get_corr_endpoint(im, head, corresp, error_thresh)
     [val, idx] = min(err);
     if val < error_thresh
         corr_point = corresp(idx, :);
+        error = val;
     else
         corr_point = [];
+        error = inf;
     end
 end
 
@@ -242,6 +288,10 @@ function im = remove_trunck(im, endpoints, threshold)
 end
 
 function resp = contains_endpoint(pixel_list, endpoints)
+    if isempty(endpoints)
+        resp = 0;
+        return
+    end
     [idx, ~] = ismember(pixel_list, endpoints, 'rows');
     resp = sum(idx);
 end
