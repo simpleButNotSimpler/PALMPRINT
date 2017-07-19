@@ -49,10 +49,15 @@
 % subplot(2, 3, 6), imshow(imsecondcanny), title('2nd e-resp canny'); hold off;
 
 %% alternative
-files = dir('data\raw_database\*.bmp');
+files = dir('data\database\raw_database\*.bmp');
 len = length(files);
+dist_threshold = 6;
+error_threshold = 2;
+area_threshold = 40;
+croc = ['|', '/', '-', '\'];
 
 for t=1:len
+    clc, disp(strcat('speed: [', croc(mod(t,3) + 1), ']'))
     im1 = imread(fullfile(files(t).folder, files(t).name));
     
     % process the image
@@ -83,12 +88,16 @@ for t=1:len
     % thigh = percentile(imsecondedge, 35);
     len = size(imsecondedge, 1);
     X = reshape(imsecondedge, 1, len*len);
-    threshold = prctile(x, [90, 75]);
+    threshold = prctile(X, [90, 75]);
     thigh = threshold(1);
     tlow = threshold(2);
-    [imsecondcanny, template] = cannys(imsecondedge, tlow, thigh);
+    [imsecondcanny, ~] = cannys(imsecondedge, tlow, thigh);
+    
+    %clean the image
+    im_cleaned = clean_palm(imsecondcanny, dist_threshold, error_threshold, area_threshold);
     
     %save the files
-    imwrite(imsecondedge, fullfile('data\processed_database\edge_response', files(t).name));
-    imwrite(imsecondcanny, fullfile('data\processed_database\canny', files(t).name));
+    imwrite(imsecondedge, fullfile('data\database\edge_response', files(t).name));
+    imwrite(imsecondcanny, fullfile('data\database\canny', files(t).name));
+    imwrite(im_cleaned, fullfile('data\database\cleaned_stage1', files(t).name));
 end

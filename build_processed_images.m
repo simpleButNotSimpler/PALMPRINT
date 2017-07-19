@@ -52,11 +52,13 @@
 dist_threshold = 6;
 error_threshold = 2;
 area_threshold = 40;
+croc = ['|', '/', '-', '\'];
 
-files = dir('data\raw_testimages\p*.bmp');
+files = dir('data\testimages\raw_testimages\p*.bmp');
 len = length(files);
 
 for t=1:len
+    clc, disp(strcat('speed: [', croc(mod(t,3) + 1), ']'))
     im1 = imread(fullfile(files(t).folder, files(t).name));
     
     % process the image
@@ -96,7 +98,7 @@ for t=1:len
     im_cleaned = clean_palm(imsecondcanny, dist_threshold, error_threshold, area_threshold);
     
     %save the files
-    imwrite(imsecondedge, fullfile('data\processed_testimages\edge_response', files(t).name));
-    imwrite(imsecondcanny, fullfile('data\processed_testimages\canny', files(t).name));
-    imwrite(im_cleaned, fullfile('data\processed_testimages\cleaned_stage1', files(t).name));
+    imwrite(imsecondedge, fullfile('data\testimages\edge_response', files(t).name));
+    imwrite(imsecondcanny, fullfile('data\testimages\canny', files(t).name));
+    imwrite(im_cleaned, fullfile('data\testimages\cleaned_stage1', files(t).name));   
 end

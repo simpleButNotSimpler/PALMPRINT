@@ -1,6 +1,7 @@
 function im = clean_palm(im, dist_threshold, error_threshold, area_threshold)
 % relevant info
 [row, col] = size(im);
+im([1:3, row-3:row],:) = 0;
 
 % clean the image
 im = clean_canny(im, dist_threshold, error_threshold, area_threshold);
